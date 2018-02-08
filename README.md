@@ -1,0 +1,2 @@
+# wcpool
+World Cup Pool
