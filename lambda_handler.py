@@ -20,7 +20,7 @@ def lambda_handler(event, context):
     tz = pytz.timezone("US/Pacific")
     global_now = datetime.now(tz=tz)
     
-    # remove comment in front of next line to test different dates
+    # remove comment on next line to test different dates
     global_now = tz.localize(datetime(2019, 8, 24, 19, 31), is_dst=None)
 
     date_format='%m/%d/%Y %H:%M:%S %Z'
