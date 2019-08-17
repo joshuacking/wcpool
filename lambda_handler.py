@@ -273,7 +273,7 @@ def lambda_handler(event, context):
         teams = pool.get_eligible_teams_with_names(season, user, week)
         
         response['text'] = "*Select a Team for Week " + str(week) + "*"
-        response['attachments'] = formatter.pick_options(week, user, teams)
+        response['attachments'] = formatter.pick_options(season, pool, week, user, teams)
         
     # return teams for a season
     elif operation == 'teams':
