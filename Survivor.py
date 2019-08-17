@@ -212,34 +212,39 @@ class Survivor(Pool):
         picks = self.__get_picks_to_date(user, week)
         gamedate_naive = ""
 
-        for game in games:
-            # has the game started?
-            try:
-                gamedate_naive = datetime.datetime.strptime(game['game_date'], "%Y-%m-%d %H:%M:%S")
-            except ValueError:
-                game['game_date'] = game['game_date'] + " 01:00:00"
-                gamedate_naive = datetime.datetime.strptime(game['game_date'], "%Y-%m-%d %H:%M:%S")
-                
-            gamedate_aware = timezone('US/Pacific').localize(gamedate_naive)
-               
-            #date_format='%m/%d/%Y %H:%M:%S %Z'
-            #print('Now:', self.global_now.strftime(date_format))
-            #print('game:', gamedate_aware.strftime(date_format))
-            if gamedate_aware < self.global_now:
-                game_started = True
-            else:
-                game_started = False
-                
-                
-            # if team hasn't been picked already and game hasn't started, team is an eligible pick
-            if (game['team1'] not in picks and not game_started) or self.__picks_complete(season, user, week): 
+        for game in games:                   
+            # if team hasn't been picked already, team is an eligible pick
+            if (game['team1'] not in picks) or self.__picks_complete(season, user, week): 
                 result.append(game['team1'])
                               
-            if (game['team2'] not in picks and not game_started) or self.__picks_complete(season, user, week): 
+            if (game['team2'] not in picks) or self.__picks_complete(season, user, week): 
                 result.append(game['team2'])
                               
         return result
 
+    def game_started(self, season, week, team):
+        self.retrieve()
+        game_started = False
+        games = season.get_schedule_by_week(week)
+        
+        for game in games:
+            # has the game started?
+            if game['team1'] == team or game['team2'] == team:
+                try:
+                    gamedate_naive = datetime.datetime.strptime(game['game_date'], "%Y-%m-%d %H:%M:%S")
+                except ValueError:
+                    game['game_date'] = game['game_date'] + " 01:00:00"
+                    gamedate_naive = datetime.datetime.strptime(game['game_date'], "%Y-%m-%d %H:%M:%S")
+            
+                gamedate_aware = timezone('US/Pacific').localize(gamedate_naive)
+           
+                if gamedate_aware < self.global_now:
+                    game_started = True
+                else:
+                    game_started = False
+                
+        return game_started
+        
     def get_eligible_teams_with_names(self, season, user, week):
         self.retrieve()
         result = []
