@@ -194,7 +194,7 @@ class SlackFormatter:
     def handle_exception(self, exception):
         return "*Error*\n" + str(exception)
 
-    def pick_options(self, week, user, teams):
+    def pick_options(self, season, pool, week, user, teams):
         attachments = []
         attachment = {}
         attachment['callback_id'] = "make_pick"
@@ -209,10 +209,11 @@ class SlackFormatter:
         action['options'] = []
         
         for team in teams:
-            option = {}
-            option['text'] = team['NAME']
-            option['value'] = team['ID']
-            action['options'].append(option)
+            if not pool.game_started(season, week, team['ID']):
+                option = {}
+                option['text'] = team['NAME']
+                option['value'] = team['ID']
+                action['options'].append(option)
 
         attachment['actions'].append(action)    
         attachments.append(attachment)
