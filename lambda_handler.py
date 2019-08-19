@@ -21,7 +21,7 @@ def lambda_handler(event, context):
     global_now = datetime.now(tz=tz)
     
     # remove comment on next line to test different dates
-    global_now = tz.localize(datetime(2019, 8, 24, 19, 31), is_dst=None)
+    #global_now = tz.localize(datetime(2019, 8, 24, 19, 31), is_dst=None)
 
     date_format='%m/%d/%Y %H:%M:%S %Z'
     print('Current date & time is:', global_now.strftime(date_format))
@@ -262,10 +262,15 @@ def lambda_handler(event, context):
         # use week passed in
         else:
             week = command[0]
-                
+            
+        if season.in_blackout():
+            rtype = 'in_channel'
+        else:
+            rtype = 'ephemeral'
+            
         stats = pool.get_stats(week, season)
         response['text'] = formatter.stats(week, pool, stats, season)
-        response['response_type'] = 'in_channel'
+        response['response_type'] = rtype
             
     elif operation == 'pick':
         week = season.get_current_week()
